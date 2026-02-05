@@ -10,4 +10,8 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val DarkMain  = Color(0xFF121011)
+val DarkMain  = Color(0xFF000000)
+val TextColor  = Color.White;
+
+val RedColor = Color(0XFFEB2F3D)
+val GrayColor = Color(0XFF767676)
