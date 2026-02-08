@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,71 +25,118 @@ import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.ui.theme.GrayColor
 import com.example.entertainhub.ui.theme.RedColor
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.unit.Dp
+import com.example.entertainhub.ui.theme.BlackColor
 
 enum class ButtonVariant {
-    RED, GRAY
+    RED, GRAY, BLACK
+}
+data class  ButtonStyles(
+    val containerColor: Color? = null,
+    val contentColor: Color? = null,
+    val radius: Dp? = null,
+    val contentPadding: PaddingValues? = null )
+
+data class IconPropsBtn(
+    val startIcon: ImageVector? = null,
+    val endIcon: ImageVector? = null,
+    val iconTint: Color = Color.White,
+    val iconSize: Int = 28
+ )
+
+private fun getDefaultStyles(variant: ButtonVariant? = null): ButtonStyles{
+     return when (variant) {
+        ButtonVariant.RED -> ButtonStyles(
+            containerColor = RedColor,
+            contentColor = Color.White,
+            radius = 16.dp,
+            contentPadding = PaddingValues(horizontal = 17.dp, vertical = 20.dp)
+        )
+        ButtonVariant.GRAY -> ButtonStyles(
+            containerColor = GrayColor,
+            contentColor = Color.White,
+            radius = 30.dp,
+            contentPadding = PaddingValues(horizontal = 17.dp, vertical = 10.dp)
+        )
+        ButtonVariant.BLACK -> ButtonStyles(
+            containerColor = BlackColor,
+            contentColor = Color.White,
+            radius = 32.dp,
+            contentPadding = PaddingValues(10.dp)
+        )
+        else -> ButtonStyles(
+            containerColor = RedColor,
+            contentColor = Color.White,
+            radius = 16.dp,
+            contentPadding = PaddingValues(horizontal = 17.dp, vertical = 20.dp)
+        )
+    }
+}
+
+private fun mergeStyles(
+    default: ButtonStyles,
+    custom: ButtonStyles?
+): ButtonStyles {
+    if (custom == null) return default
+
+    return ButtonStyles(
+        containerColor = custom.containerColor ?: default.containerColor ?: RedColor,
+        contentColor = custom.contentColor ?: default.contentColor ?: Color.White,
+        radius = custom.radius ?: default.radius ?: 16.dp,
+        contentPadding = custom.contentPadding ?: default.contentPadding ?: PaddingValues(16.dp)
+    )
 }
 
 @Composable
 fun Button(
-    label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: IconPropsBtn = IconPropsBtn(),
     fontSize: TextUnit = 18.sp,
-    variant: ButtonVariant = ButtonVariant.RED,
-    startIcon: ImageVector? = null,
-    endIcon: ImageVector? = null,
-    iconTint: Color = Color.White,
-    iconSize: Int = 28
+    label: String? = null,
+    variant: ButtonVariant? = null,
+    customStyles: ButtonStyles? = null
 ) {
-    //TODO: Подумать как иначе сделать и дефолт убрать, если variant == null
-    val (containerColor, radius, padding) = when (variant) {
-        ButtonVariant.RED -> Triple(
-            RedColor,
-            16.dp,
-            PaddingValues(horizontal = 17.dp, vertical = 20.dp)
-        )
-        ButtonVariant.GRAY -> Triple(
-            GrayColor,
-            30.dp,
-            PaddingValues(horizontal = 17.dp, vertical = 10.dp)
-        )
-    }
+
+    val styles = mergeStyles(
+        default = getDefaultStyles(variant),
+        custom = customStyles
+    )
     MaterialButton(
-        onClick, modifier, shape = RoundedCornerShape(radius), colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor, // Set the background color
-            contentColor = Color.White // Set the text/content color for contrast
-        ), contentPadding = padding
+        onClick, modifier, shape = RoundedCornerShape(styles.radius!!), colors = ButtonDefaults.buttonColors(
+            containerColor = styles.containerColor!!,
+            contentColor = styles.contentColor!!
+        ), contentPadding = styles.contentPadding!!
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (startIcon != null) {
+            if (icon.startIcon != null) {
                 Icon(
-                    imageVector = startIcon,
+                    imageVector = icon.startIcon,
                     contentDescription = null,
-                    tint = iconTint,
+                    tint = icon.iconTint,
                     modifier = Modifier
-                        .size(iconSize.dp)
-                        .padding(end = 8.dp)
+                        .size(icon.iconSize.dp)
                 )
             }
-            Text(
-                text = label,
-                Modifier.then(modifier),
-                color = Color.White,
-                fontSize = fontSize,
-                textAlign = TextAlign.Center,
-            )
-            if (endIcon != null) {
+            if(label != null){
+                Text(
+                    text = label,
+                    color = Color.White,
+                    fontSize = fontSize,
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            if (icon.endIcon != null) {
                 Icon(
-                    imageVector = endIcon,
+                    imageVector = icon.endIcon,
                     contentDescription = null,
-                    tint = iconTint ,
+                    tint = icon.iconTint ,
                     modifier = Modifier
-                        .size(iconSize.dp)
-                        .padding(start = 8.dp)
+                        .size(icon.iconSize.dp)
                 )
             }
         }
@@ -130,7 +176,8 @@ fun ButtonIconLeft() {
         Button(
             label = "Book Tickets",
             onClick = {},
-            startIcon = Icons.Filled.Info)
+            icon = IconPropsBtn( startIcon =  Icons.Filled.Info)
+        )
     }
 }
 
@@ -141,7 +188,7 @@ fun ButtonIconRight() {
         Button(
             label = "Book Tickets",
             onClick = {},
-            endIcon = Icons.Filled.Info)
+            icon = IconPropsBtn( endIcon =  Icons.Filled.Info))
     }
 }
 
@@ -152,7 +199,18 @@ fun ButtonIconLeftRight() {
         Button(
             label = "Book Tickets",
             onClick = {},
-            startIcon = Icons.Filled.Info,
-            endIcon = Icons.Filled.Info)
+            icon = IconPropsBtn( endIcon =  Icons.Filled.Info, startIcon =  Icons.Filled.Info))
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = false)
+@Composable
+fun ButtonBlack() {
+    EntertainHubTheme {
+        Button(
+            onClick = {},
+            icon = IconPropsBtn( startIcon =  Icons.Filled.Info),
+            variant = ButtonVariant.BLACK)
+
     }
 }
