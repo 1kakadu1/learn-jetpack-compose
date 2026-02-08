@@ -15,3 +15,6 @@ val TextColor  = Color.White;
 
 val RedColor = Color(0XFFEB2F3D)
 val GrayColor = Color(0XFF767676)
+
+val GradientGrayStartColor = Color(0xFF4A4A4A)
+val GradientGrayEndColor = Color(0xFF2C2C2C)

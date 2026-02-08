@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.entertainhub.ui.components.button.ButtonVariant
 import com.example.entertainhub.ui.components.scaffolds.MainScaffold
+import com.example.entertainhub.ui.components.gradient_button.GradientButton
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.ui.theme.GrayColor
 
@@ -40,9 +41,9 @@ fun HomeScreen(name: String, modifier: Modifier = Modifier) {
                 onClick = {},
                 modifier = Modifier,
                 fontSize = 16.sp,
-                containerColor = GrayColor,
                 variant = ButtonVariant.GRAY
             )
+            GradientButton(label = "Book", onClick = {})
             Box(Modifier.size(20.dp))
             Text(
                 text = "Hello $name! ${MaterialTheme.colorScheme.background}",
