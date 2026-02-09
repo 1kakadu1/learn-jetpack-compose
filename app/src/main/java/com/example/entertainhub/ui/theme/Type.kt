@@ -1,5 +1,6 @@
 package com.example.entertainhub.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -25,7 +26,7 @@ val Typography = Typography(
         fontFamily = InterFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp
+        lineHeight = 24.sp,
     ),
 
     labelLarge = TextStyle(

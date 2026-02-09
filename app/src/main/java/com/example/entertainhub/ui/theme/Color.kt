@@ -10,12 +10,12 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val DarkMain  = Color(0xFF000000)
-val BlackColor  = Color(0xFF1E1E1E)
-val TextColor  = Color.White;
+val DarkMain = Color(0xFF000000)
+val BlackColor = Color(0xFF1E1E1E)
+val TextColor = Color.White;
 
 val RedColor = Color(0XFFEB2F3D)
 val GrayColor = Color(0XFF767676)
 
-val GradientGrayStartColor = Color(0xFF4A4A4A)
-val GradientGrayEndColor = Color(0xFF2C2C2C)
+val GradientGrayStartColor = Color(0xFF2C2C2C)
+val GradientGrayEndColor = Color(0xFF4A4A4A)

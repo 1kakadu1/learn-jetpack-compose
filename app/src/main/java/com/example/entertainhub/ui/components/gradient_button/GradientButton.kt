@@ -1,6 +1,7 @@
 package com.example.entertainhub.ui.components.gradient_button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -10,11 +11,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.entertainhub.R
 import com.example.entertainhub.ui.theme.GradientGrayEndColor
 import com.example.entertainhub.ui.theme.GradientGrayStartColor
 
@@ -60,35 +64,35 @@ private fun GradientIcon(
 fun GradientButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    radius: Dp = 58.dp,
     gradient: GradientButtonProps = GradientButtonProps(),
+    iconTint: Color = Color.White,
+    iconSize: Int = 28,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     label: String? = null,
     startIcon: GradientButtonIcon? = null,
     endIcon: GradientButtonIcon? = null,
-    iconTint: Color = Color.White,
-    iconSize: Int = 28
+
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier                .background(
+            brush = Brush.horizontalGradient(
+                colors = listOf(
+                    gradient.start,
+                    gradient.end
+                )
+            ),
+            shape = RoundedCornerShape(radius)
+        ),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
         ),
-        contentPadding = PaddingValues(0.dp),
-        shape = RoundedCornerShape(20.dp)
+        contentPadding = contentPadding,
+        shape = RoundedCornerShape(radius)
     ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            gradient.start,
-                            gradient.end
-                        )
-                    ),
-                    shape = RoundedCornerShape(20.dp)
-                )
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-            contentAlignment = Alignment.Center
+        Row(
+            horizontalArrangement = Arrangement.Center
         ) {
             startIcon?.let {
                 GradientIcon(
@@ -123,5 +127,20 @@ fun GradientButtonPreview() {
     GradientButton(
         label = "Book",
         onClick = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GradientButtonIconPreview() {
+    GradientButton(
+        modifier = Modifier.size(50.dp),
+        onClick = {},
+        iconSize = 15,
+        radius = 50.dp,
+        contentPadding = PaddingValues(0.dp),
+        startIcon = GradientButtonIcon.PainterIcon(
+            painterResource(id = R.drawable.search_icon)
+        )
     )
 }

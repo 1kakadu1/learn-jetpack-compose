@@ -20,13 +20,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EntertainHubTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     HomeScreen(
-                        name = "Android 124",
-                        modifier = Modifier.padding(innerPadding)
+                        name = "Android 124"
                     )
                 }
             }
         }
     }
-}
