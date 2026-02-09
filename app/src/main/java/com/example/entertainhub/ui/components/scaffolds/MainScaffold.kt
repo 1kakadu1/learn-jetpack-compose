@@ -13,10 +13,18 @@ import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun MainScaffold(
-    content: @Composable (PaddingValues) -> Unit
+    modifier: Modifier = Modifier,
+    bottomBar: @Composable () -> Unit = {},
+    topBar: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = modifier,
+        bottomBar = bottomBar,
+        topBar = topBar,
+        floatingActionButton = floatingActionButton
     ) { paddingValues ->
         content(paddingValues)
     }

@@ -25,7 +25,10 @@ import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.ui.theme.GrayColor
 import com.example.entertainhub.ui.theme.RedColor
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import com.example.entertainhub.R
 import com.example.entertainhub.ui.theme.BlackColor
 
 enum class ButtonVariant {
@@ -37,12 +40,38 @@ data class  ButtonStyles(
     val radius: Dp? = null,
     val contentPadding: PaddingValues? = null )
 
-data class IconPropsBtn(
-    val startIcon: ImageVector? = null,
-    val endIcon: ImageVector? = null,
-    val iconTint: Color = Color.White,
-    val iconSize: Int = 28
- )
+
+sealed class ButtonIcon {
+    data class Vector(val imageVector: ImageVector) : ButtonIcon()
+    data class PainterIcon(val painter: Painter) : ButtonIcon()
+}
+
+@Composable
+private fun GradientIcon(
+    icon: ButtonIcon,
+    tint: Color,
+    size: Int
+) {
+    when (icon) {
+        is ButtonIcon.Vector -> {
+            Icon(
+                imageVector = icon.imageVector,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(size.dp)
+            )
+        }
+
+        is ButtonIcon.PainterIcon -> {
+            Icon(
+                painter = icon.painter,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(size.dp)
+            )
+        }
+    }
+}
 
 private fun getDefaultStyles(variant: ButtonVariant? = null): ButtonStyles{
      return when (variant) {
@@ -91,11 +120,14 @@ private fun mergeStyles(
 fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    icon: IconPropsBtn = IconPropsBtn(),
     fontSize: TextUnit = 18.sp,
+    iconTint: Color = Color.White,
+    iconSize: Int = 28,
     label: String? = null,
     variant: ButtonVariant? = null,
-    customStyles: ButtonStyles? = null
+    customStyles: ButtonStyles? = null,
+    startIcon: ButtonIcon? = null,
+    endIcon: ButtonIcon? = null,
 ) {
 
     val styles = mergeStyles(
@@ -112,13 +144,11 @@ fun Button(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (icon.startIcon != null) {
-                Icon(
-                    imageVector = icon.startIcon,
-                    contentDescription = null,
-                    tint = icon.iconTint,
-                    modifier = Modifier
-                        .size(icon.iconSize.dp)
+            startIcon?.let {
+                GradientIcon(
+                    icon = it,
+                    tint = iconTint,
+                    size = iconSize
                 )
             }
             if(label != null){
@@ -130,13 +160,11 @@ fun Button(
                 )
             }
 
-            if (icon.endIcon != null) {
-                Icon(
-                    imageVector = icon.endIcon,
-                    contentDescription = null,
-                    tint = icon.iconTint ,
-                    modifier = Modifier
-                        .size(icon.iconSize.dp)
+            endIcon?.let {
+                GradientIcon(
+                    icon = it,
+                    tint = iconTint,
+                    size = iconSize
                 )
             }
         }
@@ -176,7 +204,7 @@ fun ButtonIconLeft() {
         Button(
             label = "Book Tickets",
             onClick = {},
-            icon = IconPropsBtn( startIcon =  Icons.Filled.Info)
+            startIcon = ButtonIcon.Vector(Icons.Filled.Info),
         )
     }
 }
@@ -188,7 +216,7 @@ fun ButtonIconRight() {
         Button(
             label = "Book Tickets",
             onClick = {},
-            icon = IconPropsBtn( endIcon =  Icons.Filled.Info))
+            endIcon = ButtonIcon.Vector(Icons.Filled.Info))
     }
 }
 
@@ -199,7 +227,7 @@ fun ButtonIconLeftRight() {
         Button(
             label = "Book Tickets",
             onClick = {},
-            icon = IconPropsBtn( endIcon =  Icons.Filled.Info, startIcon =  Icons.Filled.Info))
+            startIcon = ButtonIcon.Vector(Icons.Filled.Info), endIcon = ButtonIcon.Vector(Icons.Filled.Info),)
     }
 }
 
@@ -209,8 +237,34 @@ fun ButtonBlack() {
     EntertainHubTheme {
         Button(
             onClick = {},
-            icon = IconPropsBtn( startIcon =  Icons.Filled.Info),
+            startIcon = ButtonIcon.Vector(Icons.Filled.Info),
             variant = ButtonVariant.BLACK)
 
+    }
+}
+
+@Preview(showBackground = false, showSystemUi = false)
+@Composable
+fun ButtonRes() {
+    EntertainHubTheme {
+        Button(
+            onClick = {},
+            startIcon = ButtonIcon.PainterIcon(painterResource(R.drawable.video)),
+            label = "Video"
+        )
+    }
+}
+
+@Preview(showBackground = false, showSystemUi = false)
+@Composable
+fun ButtonResCustom() {
+    EntertainHubTheme {
+        Button(
+            onClick = {},
+            startIcon = ButtonIcon.PainterIcon(painterResource(R.drawable.video)),
+            iconSize = 18,
+            label = "Video",
+            customStyles = ButtonStyles(contentPadding = PaddingValues(4.dp), radius = 4.dp)
+        )
     }
 }

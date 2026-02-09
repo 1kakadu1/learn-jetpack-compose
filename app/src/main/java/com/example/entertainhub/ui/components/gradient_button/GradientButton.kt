@@ -8,7 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,12 +23,49 @@ data class GradientButtonProps(
     val end: Color = GradientGrayEndColor
 )
 
+sealed class GradientButtonIcon {
+    data class Vector(val imageVector: ImageVector) : GradientButtonIcon()
+    data class PainterIcon(val painter: Painter) : GradientButtonIcon()
+}
+
+@Composable
+private fun GradientIcon(
+    icon: GradientButtonIcon,
+    tint: Color,
+    size: Int
+) {
+    when (icon) {
+        is GradientButtonIcon.Vector -> {
+            Icon(
+                imageVector = icon.imageVector,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(size.dp)
+            )
+        }
+
+        is GradientButtonIcon.PainterIcon -> {
+            Icon(
+                painter = icon.painter,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(size.dp)
+            )
+        }
+    }
+}
+
+
 @Composable
 fun GradientButton(
-    label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gradient: GradientButtonProps = GradientButtonProps()
+    gradient: GradientButtonProps = GradientButtonProps(),
+    label: String? = null,
+    startIcon: GradientButtonIcon? = null,
+    endIcon: GradientButtonIcon? = null,
+    iconTint: Color = Color.White,
+    iconSize: Int = 28
 ) {
     Button(
         onClick = onClick,
@@ -50,12 +90,29 @@ fun GradientButton(
                 .padding(horizontal = 24.dp, vertical = 12.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = label,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
+            startIcon?.let {
+                GradientIcon(
+                    icon = it,
+                    tint = iconTint,
+                    size = iconSize
+                )
+            }
+
+            if(label != null)
+                Text(
+                    text = label,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+
+            endIcon?.let {
+                GradientIcon(
+                    icon = it,
+                    tint = iconTint,
+                    size = iconSize
+                )
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 package com.example.entertainhub.ui.screens.home
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,12 +19,14 @@ import androidx.compose.ui.unit.sp
 import com.example.entertainhub.ui.components.button.ButtonVariant
 import com.example.entertainhub.ui.components.scaffolds.MainScaffold
 import com.example.entertainhub.ui.components.gradient_button.GradientButton
+import com.example.entertainhub.ui.components.home_bottom_app_bar.HomeBottomAppBar
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.ui.theme.GrayColor
 
 @Composable
 fun HomeScreen(name: String, modifier: Modifier = Modifier) {
     MainScaffold(
+        bottomBar = { HomeBottomAppBar() }
     ) { paddingValues ->
         Column(
             modifier = Modifier
