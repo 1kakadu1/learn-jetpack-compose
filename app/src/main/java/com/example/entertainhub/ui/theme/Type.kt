@@ -36,3 +36,12 @@ val Typography = Typography(
         lineHeight = 20.sp
     )
 )
+
+val customTypography = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.W500,
+        fontSize = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
+)
