@@ -20,13 +20,15 @@ import com.example.entertainhub.ui.components.gradient_button.GradientButtonIcon
 import com.example.entertainhub.ui.theme.RedColor
 
 @Composable
-fun HeaderMain() {
+fun HeaderMain(
+    onClickSearch: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column{
+        Column {
             Text(
                 text = "Hey!",
                 style = MaterialTheme.typography.headlineLarge
@@ -43,7 +45,7 @@ fun HeaderMain() {
         ) {
             GradientButton(
                 modifier = Modifier.size(50.dp),
-                onClick = {},
+                onClick = onClickSearch,
                 iconSize = 28,
                 radius = 50.dp,
                 startIcon = GradientButtonIcon.PainterIcon(
@@ -68,5 +70,7 @@ fun HeaderMain() {
 @Preview(showBackground = true)
 @Composable
 fun HeaderMainPreview() {
-    HeaderMain()
+    HeaderMain(
+        onClickSearch = {}
+    )
 }

@@ -29,6 +29,13 @@ val Typography = Typography(
         lineHeight = 24.sp,
     ),
 
+    bodySmall = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 24.sp,
+    ),
+
     labelLarge = TextStyle(
         fontFamily = InterFontFamily,
         fontWeight = FontWeight.Medium,

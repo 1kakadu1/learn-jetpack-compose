@@ -32,8 +32,7 @@ fun MediaCarousel(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -64,7 +63,7 @@ fun MediaCarousel(
             }
         }
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
+            contentPadding = PaddingValues(horizontal = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(

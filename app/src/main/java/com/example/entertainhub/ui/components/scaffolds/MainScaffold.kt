@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun MainScaffold(
@@ -26,7 +27,11 @@ fun MainScaffold(
         topBar = topBar,
         floatingActionButton = floatingActionButton
     ) { paddingValues ->
-        content(paddingValues)
+        Box(
+            modifier = Modifier.padding(horizontal = 20.dp)
+        ) {
+            content(paddingValues)
+        }
     }
 }
 
@@ -34,8 +39,7 @@ fun MainScaffold(
 @Composable
 fun MainScaffoldPreview() {
     EntertainHubTheme {
-        MainScaffold(
-        ) { paddingValues ->
+        MainScaffold { paddingValues ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
