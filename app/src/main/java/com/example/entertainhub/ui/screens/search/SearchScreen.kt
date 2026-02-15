@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as itemsGrid
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,7 +51,13 @@ fun SearchScreen(onBack: () -> Unit) {
 }
 
 @Composable
-fun SearchView(onBack: () -> Unit, search: String, onQueryChange: (String) -> Unit, searchState: SearchState) {
+fun SearchView(
+    onBack: () -> Unit,
+    search: String,
+    onQueryChange: (String) -> Unit,
+    searchState: SearchState,
+    isList: Boolean = false
+) {
     MainScaffold(
         topBar = {
             SearchTopBar(
@@ -74,7 +84,8 @@ fun SearchView(onBack: () -> Unit, search: String, onQueryChange: (String) -> Un
             SearchResults(
                 query = search,
                 state = searchState,
-                onItemClick={}
+                onItemClick = {},
+                isList= isList
             )
         }
     }
@@ -84,17 +95,25 @@ fun SearchView(onBack: () -> Unit, search: String, onQueryChange: (String) -> Un
 private fun SearchResults(
     query: String,
     state: SearchState,
-    onItemClick: (String) -> Unit
+    onItemClick: (String) -> Unit,
+    isList: Boolean = false
 ) {
     when {
         query.isEmpty() -> EmptySearchState()
         state.isSearching -> LoadingState()
         state.results.isEmpty() -> NoResultsState()
         else -> {
-            SearchResultsList(
-                results = state.results,
-                onItemClick = onItemClick
-            )
+            if(isList){
+                SearchResultsList(
+                    results = state.results,
+                    onItemClick = onItemClick
+                )
+            }else{
+                SearchResultsGrid(
+                    results = state.results,
+                    onItemClick = onItemClick
+                )
+            }
         }
     }
 }
@@ -180,6 +199,37 @@ private fun SearchResultsList(
     }
 }
 
+@Composable
+private fun SearchResultsGrid(
+    results: List<SearchResult>,
+    onItemClick: (String) -> Unit
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 162.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Text(
+                "Found ${results.size} results",
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+        }
+        itemsGrid(
+            items = results,
+            key = { it.id }
+        ) { item ->
+            CardSmall(
+                title = item.title,
+                imageUrl = item.title,
+                onClick = { onItemClick(item.id) }
+            )
+        }
+    }
+
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun SearchScreenPreview() {
@@ -200,11 +250,39 @@ fun SearchScreenResultsPreview() {
                 query = "Batman",
                 results = listOf(
                     SearchResult("1", "THE BATMAN", ""),
-                    SearchResult("2", "BATMAN BEGINS", "")
+                    SearchResult("2", "BATMAN BEGINS", ""),
+                    SearchResult("3", "THE BATMAN", ""),
+                    SearchResult("4", "BATMAN BEGINS", ""),
+                    SearchResult("5", "THE BATMAN", ""),
+                    SearchResult("6", "BATMAN BEGINS", "")
                 )
             ),
             onQueryChange = {},
             onBack = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SearchScreenResultsListPreview() {
+    EntertainHubTheme {
+        SearchView(
+            search = "Batman",
+            searchState = SearchState(
+                query = "Batman",
+                results = listOf(
+                    SearchResult("1", "THE BATMAN", ""),
+                    SearchResult("2", "BATMAN BEGINS", ""),
+                    SearchResult("3", "THE BATMAN", ""),
+                    SearchResult("4", "BATMAN BEGINS", ""),
+                    SearchResult("5", "THE BATMAN", ""),
+                    SearchResult("6", "BATMAN BEGINS", "")
+                )
+            ),
+            onQueryChange = {},
+            onBack = {},
+            isList = true
         )
     }
 }
