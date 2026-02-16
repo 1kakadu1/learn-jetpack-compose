@@ -11,10 +11,10 @@ import com.example.entertainhub.ui.theme.EntertainHubTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
-
 @Composable
 fun MainScaffold(
     modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(horizontal = 20.dp),
     bottomBar: @Composable () -> Unit = {},
     topBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
@@ -28,7 +28,7 @@ fun MainScaffold(
         floatingActionButton = floatingActionButton
     ) { paddingValues ->
         Box(
-            modifier = Modifier.padding(horizontal = 20.dp)
+            modifier = Modifier.padding(padding )
         ) {
             content(paddingValues)
         }

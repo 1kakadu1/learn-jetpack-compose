@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.entertainhub.ui.screens.details_movie.DetailsScreen
+import com.example.entertainhub.ui.screens.details_movie.MovieDetailScreenWithParallax
 import com.example.entertainhub.ui.screens.home.HomeScreen
 import com.example.entertainhub.ui.screens.search.SearchScreen
 
@@ -58,9 +58,9 @@ fun NavGraph(
             )
         ) { backStackEntry ->
             val movieId = backStackEntry.arguments?.getString("movieId") ?: ""
-            DetailsScreen(
+            MovieDetailScreenWithParallax(
                 movieId = movieId,
-                onNavigateBack = {
+                onBackClick = {
                     navController.popBackStack()
                 }
             )

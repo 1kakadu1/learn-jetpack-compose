@@ -18,8 +18,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             EntertainHubTheme {
                 val navController = rememberNavController()
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightStatusBars = false
+               // val controller = WindowInsetsControllerCompat(window, window.decorView)
+              //  controller.isAppearanceLightStatusBars = false
                 CompositionLocalProvider(LocalNavController provides navController) {
                     NavGraph(navController = navController)
                 }

@@ -36,6 +36,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.ui.Alignment
+import com.example.entertainhub.ui.theme.DarkMain
+import com.example.entertainhub.utils.SetSystemBarsColor
 
 @Composable
 fun SearchScreen(onBack: () -> Unit) {
@@ -58,6 +60,11 @@ fun SearchView(
     searchState: SearchState,
     isList: Boolean = false
 ) {
+    SetSystemBarsColor(
+        statusBarColor = DarkMain,
+        darkIcons = false,
+        restoreToTheme = false
+    )
     MainScaffold(
         topBar = {
             SearchTopBar(

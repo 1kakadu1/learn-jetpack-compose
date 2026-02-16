@@ -19,12 +19,20 @@ import com.example.entertainhub.ui.components.headers.header_main.HeaderMain
 import com.example.entertainhub.ui.components.home_bottom_app_bar.HomeBottomAppBar
 import com.example.entertainhub.ui.navigation.LocalNavController
 import com.example.entertainhub.ui.navigation.Routes
+import com.example.entertainhub.ui.theme.DarkMain
 import com.example.entertainhub.ui.theme.EntertainHubTheme
+import com.example.entertainhub.utils.SetSystemBarsColor
 
 @Composable
 fun HomeScreen() {
     val navController = LocalNavController.current
     val gotoDetail: (String) -> Unit = { id -> navController.navigate(Routes.details(id)) }
+
+    SetSystemBarsColor(
+        statusBarColor = DarkMain,
+        darkIcons = false,
+        restoreToTheme = false
+    )
     MainScaffold(
         bottomBar = { HomeBottomAppBar() }
     ) { paddingValues ->
