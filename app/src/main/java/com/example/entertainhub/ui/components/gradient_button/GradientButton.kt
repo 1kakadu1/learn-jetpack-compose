@@ -92,7 +92,8 @@ fun GradientButton(
         shape = RoundedCornerShape(radius)
     ) {
         Row(
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             startIcon?.let {
                 GradientIcon(
@@ -143,4 +144,21 @@ fun GradientButtonIconPreview() {
             painterResource(id = R.drawable.search_icon)
         )
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GradientButtonTextIconPreview() {Box(
+    modifier = Modifier
+        .width(160.dp)
+){
+    GradientButton(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = {},
+        label = "Watch Trailer",
+        endIcon = GradientButtonIcon.PainterIcon(painter = painterResource(R.drawable.play_light_icon))
+    )
+}
+
+
 }
