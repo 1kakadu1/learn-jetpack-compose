@@ -8,9 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.entertainhub.data.mock.MovieMockData
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCard
 import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarousel
@@ -26,8 +30,14 @@ import com.example.entertainhub.utils.SetSystemBarsColor
 @Composable
 fun HomeScreen() {
     val navController = LocalNavController.current
-    val gotoDetail: (String) -> Unit = { id -> navController.navigate(Routes.details(id)) }
+    val viewModel = viewModel<HomeViewModel>()
+    val uiState by viewModel.uiState.collectAsState()
+    HomeView(navController = navController, uiState = uiState)
+}
 
+@Composable
+fun HomeView(navController: NavHostController, uiState:  HomeUiState) {
+    val gotoDetail: (String) -> Unit = { id -> navController.navigate(Routes.details(id)) }
     SetSystemBarsColor(
         statusBarColor = DarkMain,
         darkIcons = false,
@@ -97,6 +107,9 @@ fun HomeScreen() {
 @Composable
 fun HomeScreenPreview() {
     EntertainHubTheme {
-        HomeScreen()
+        val navController = LocalNavController.current
+        val viewModel = viewModel<HomeViewModel>()
+        val uiState by viewModel.uiState.collectAsState()
+        HomeView(navController = navController, uiState = uiState)
     }
 }
