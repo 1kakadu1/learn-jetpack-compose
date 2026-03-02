@@ -27,5 +27,20 @@ class MovieRepository {
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
-    }.flowOn(Dispatchers.IO)  // ← Выполнять в IO потоке (не блокировать UI
+    }.flowOn(Dispatchers.IO)
+
+    fun getTopRatedMovies(page: Int = 1): Flow<Result<List<Movie>>> = flow {
+        try {
+            val response = api.getTopRatedMovies(
+                language = "en-US",
+                page = page
+            )
+
+            val movies = MovieMapper.fromDtoList(response.results)
+            emit(Result.success(movies))
+
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }.flowOn(Dispatchers.IO)
 }

@@ -21,23 +21,31 @@ import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCaro
 import com.example.entertainhub.ui.components.scaffolds.MainScaffold
 import com.example.entertainhub.ui.components.headers.header_main.HeaderMain
 import com.example.entertainhub.ui.components.home_bottom_app_bar.HomeBottomAppBar
-import com.example.entertainhub.ui.navigation.LocalNavController
 import com.example.entertainhub.ui.navigation.Routes
 import com.example.entertainhub.ui.theme.DarkMain
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.utils.SetSystemBarsColor
 
 @Composable
-fun HomeScreen() {
-    val navController = LocalNavController.current
+fun HomeScreen(navController: NavHostController) {
     val viewModel = viewModel<HomeViewModel>()
     val uiState by viewModel.uiState.collectAsState()
-    HomeView(navController = navController, uiState = uiState)
+    val onNavigateMovieDetail: (String) -> Unit =
+        { id -> navController.navigate(Routes.details(id)) }
+    val onNavigateSearch: () -> Unit = { navController.navigate(Routes.SEARCH) }
+    HomeView(
+        onNavigateMovieDetail = onNavigateMovieDetail,
+        onNavigateSearch = onNavigateSearch,
+        uiState = uiState
+    )
 }
 
 @Composable
-fun HomeView(navController: NavHostController, uiState:  HomeUiState) {
-    val gotoDetail: (String) -> Unit = { id -> navController.navigate(Routes.details(id)) }
+fun HomeView(
+    onNavigateMovieDetail: (String) -> Unit,
+    onNavigateSearch: () -> Unit,
+    uiState: HomeUiState
+) {
     SetSystemBarsColor(
         statusBarColor = DarkMain,
         darkIcons = false,
@@ -53,9 +61,7 @@ fun HomeView(navController: NavHostController, uiState:  HomeUiState) {
         ) {
             item {
                 HeaderMain(
-                    onClickSearch = {
-                        navController.navigate(Routes.SEARCH)
-                    }
+                    onClickSearch = onNavigateSearch
                 )
             }
             item {
@@ -70,7 +76,7 @@ fun HomeView(navController: NavHostController, uiState:  HomeUiState) {
                     genre = "FANTASY",
                     format = "2D.3D.4DX",
                     onWatchTrailerClick = {},
-                    onBookClick = { gotoDetail("featured-movie") }
+                    onBookClick = { onNavigateMovieDetail("featured-movie") }
                 )
             }
 
@@ -82,7 +88,8 @@ fun HomeView(navController: NavHostController, uiState:  HomeUiState) {
                     title = "Recommended Movies",
                     items = MovieMockData.recommendedMovies,
                     onSeeAllClick = {},
-                    onItemClick = { gotoDetail("featured-movie") }
+                    onItemClick = { onNavigateMovieDetail("featured-movie") },
+                    isLoading = uiState.popularMovies.isLoading
                 )
             }
             item {
@@ -93,7 +100,7 @@ fun HomeView(navController: NavHostController, uiState:  HomeUiState) {
                     title = "Recommended Movies",
                     items = MovieMockData.recommendedMovies,
                     onSeeAllClick = {},
-                    onItemClick = { gotoDetail("featured-movie") }
+                    onItemClick = { onNavigateMovieDetail("featured-movie") }
                 )
             }
             item {
@@ -107,9 +114,22 @@ fun HomeView(navController: NavHostController, uiState:  HomeUiState) {
 @Composable
 fun HomeScreenPreview() {
     EntertainHubTheme {
-        val navController = LocalNavController.current
-        val viewModel = viewModel<HomeViewModel>()
-        val uiState by viewModel.uiState.collectAsState()
-        HomeView(navController = navController, uiState = uiState)
+        HomeView(onNavigateMovieDetail = {}, onNavigateSearch = {}, uiState = HomeUiState(
+            popularMovies = DataState(isLoading = false),
+            topRated = DataState(isLoading = false)
+        ))
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenPreviewLoading() {
+    EntertainHubTheme {
+        HomeView(
+            onNavigateMovieDetail = {}, onNavigateSearch = {}, uiState = HomeUiState(
+            popularMovies = DataState(isLoading = true),
+            topRated = DataState(isLoading = true)
+        )
+        )
     }
 }

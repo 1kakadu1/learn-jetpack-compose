@@ -46,7 +46,7 @@ fun NavGraph(
         }
     ) {
         composable(route = Routes.HOME) {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
 
         composable(

@@ -9,10 +9,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-data class HomeUiState(
-    val popularMovies: List<Movie> = emptyList(),
+data class DataState<T>(
+    val data: List<T> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null
+)
+
+data class HomeUiState(
+    val popularMovies: DataState<Movie> = DataState(),
+    val topRated: DataState<Movie> = DataState(),
 )
 
 class HomeViewModel(
@@ -23,34 +28,74 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        loadAllData()
+    }
+
+    private fun updatePopularMovies(
+        update: (DataState<Movie>) -> DataState<Movie>
+    ) {
+        _uiState.value = _uiState.value.copy(
+            popularMovies = update(_uiState.value.popularMovies)
+        )
+    }
+
+    private fun updateTopRated(
+        update: (DataState<Movie>) -> DataState<Movie>
+    ) {
+        _uiState.value = _uiState.value.copy(
+            topRated = update(_uiState.value.topRated)
+        )
+    }
+
+
+    fun loadAllData() {
         loadPopularMovies()
+        loadTopRatedMovies()
     }
 
     fun loadPopularMovies() {
-        viewModelScope.launch {  // ← Корутина в scope ViewModel
-            // 1. Устанавливаем loading = true
-            _uiState.value = _uiState.value.copy(
-                isLoading = true,
-                error = null
-            )
+        viewModelScope.launch {
+            updatePopularMovies { it.copy(isLoading = true, error = null) }
 
-            // 2. Собираем данные из Flow
             repository.getPopularMovies().collect { result ->
-                // 3. Обрабатываем результат
                 result.onSuccess { movies ->
-                    // Успешно - обновляем список
-                    _uiState.value = _uiState.value.copy(
-                        popularMovies = movies,
-                        isLoading = false,
-                        error = null
-                    )
+                    updatePopularMovies {
+                        it.copy(
+                            data = movies,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
                 }.onFailure { exception ->
-                    // Ошибка - сохраняем сообщение
-                    _uiState.value = _uiState.value.copy(
-                        popularMovies = emptyList(),
-                        isLoading = false,
-                        error = exception.message ?: "Unknown error"
-                    )
+                    updatePopularMovies {
+                        it.copy(
+                            data = emptyList(),
+                            isLoading = false,
+                            error = exception.message ?: "Unknown error"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun loadTopRatedMovies() {
+        viewModelScope.launch {
+            updateTopRated { it.copy(isLoading = true, error = null) }
+
+            repository.getTopRatedMovies().collect { result ->
+                result.onSuccess { movies ->
+                    updateTopRated {
+                        it.copy(data = movies, isLoading = false, error = null)
+                    }
+                }.onFailure { exception ->
+                    updateTopRated {
+                        it.copy(
+                            data = emptyList(),
+                            isLoading = false,
+                            error = exception.message ?: "Unknown error"
+                        )
+                    }
                 }
             }
         }
@@ -58,6 +103,6 @@ class HomeViewModel(
 
 
     fun retry() {
-        loadPopularMovies()
+        loadAllData()
     }
 }
