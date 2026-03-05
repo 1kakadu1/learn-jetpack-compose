@@ -29,9 +29,18 @@ data class MovieDto(
     val voteAverage: Double,
 
     @SerializedName("genre_ids")
-    val genreIds: List<Int>
+    val genreIds: List<Int>,
+
+    @SerializedName("original_language")
+    val originalLanguage: String
 )
 
+data class MoviesResponseDates(
+    @SerializedName("maximum")
+    val maximum: String,
+    @SerializedName("minimum")
+    val minimum: String
+)
 
 data class MoviesResponse(
     @SerializedName("page")
@@ -44,5 +53,8 @@ data class MoviesResponse(
     val totalPages: Int,
 
     @SerializedName("total_results")
-    val totalResults: Int
+    val totalResults: Int,
+
+    @SerializedName("dates")
+    val dates: MoviesResponseDates? = null
 )

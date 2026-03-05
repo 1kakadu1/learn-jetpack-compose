@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.entertainhub.data.model.Movie
 import com.example.entertainhub.data.repository.MovieRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 data class DataState<T>(
@@ -18,6 +20,7 @@ data class DataState<T>(
 data class HomeUiState(
     val popularMovies: DataState<Movie> = DataState(),
     val topRated: DataState<Movie> = DataState(),
+    val nowPlaying: DataState<Movie> = DataState(),
 )
 
 class HomeViewModel(
@@ -31,74 +34,84 @@ class HomeViewModel(
         loadAllData()
     }
 
-    private fun updatePopularMovies(
-        update: (DataState<Movie>) -> DataState<Movie>
+    private fun updateMovieState(
+        update: (DataState<Movie>) -> DataState<Movie>,
+        stateSelector: (HomeUiState) -> DataState<Movie>,
+        stateCopier: (HomeUiState, DataState<Movie>) -> HomeUiState
     ) {
-        _uiState.value = _uiState.value.copy(
-            popularMovies = update(_uiState.value.popularMovies)
+        _uiState.value = stateCopier(
+            _uiState.value,
+            update(stateSelector(_uiState.value))
         )
     }
 
-    private fun updateTopRated(
-        update: (DataState<Movie>) -> DataState<Movie>
+    private fun loadMovies(
+        repositoryCall: () -> Flow<Result<List<Movie>>>,
+        updateState: ((DataState<Movie>) -> DataState<Movie>) -> Unit
     ) {
-        _uiState.value = _uiState.value.copy(
-            topRated = update(_uiState.value.topRated)
-        )
+        viewModelScope.launch {
+            updateState { it.copy(isLoading = true, error = null) }
+
+            try {
+                repositoryCall().first().onSuccess { movies ->
+                    updateState {
+                        it.copy(data = movies, isLoading = false, error = null)
+                    }
+                }.onFailure { exception ->
+                    updateState {
+                        it.copy(
+                            data = emptyList(),
+                            isLoading = false,
+                            error = exception.message ?: "Unknown error"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                updateState {
+                    it.copy(error = e.message, isLoading = false)
+                }
+            }
+        }
     }
 
 
     fun loadAllData() {
         loadPopularMovies()
         loadTopRatedMovies()
+        loadNowPlayingMovies()
     }
 
     fun loadPopularMovies() {
-        viewModelScope.launch {
-            updatePopularMovies { it.copy(isLoading = true, error = null) }
-
-            repository.getPopularMovies().collect { result ->
-                result.onSuccess { movies ->
-                    updatePopularMovies {
-                        it.copy(
-                            data = movies,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }.onFailure { exception ->
-                    updatePopularMovies {
-                        it.copy(
-                            data = emptyList(),
-                            isLoading = false,
-                            error = exception.message ?: "Unknown error"
-                        )
-                    }
-                }
+        loadMovies(
+            repositoryCall = { repository.getPopularMovies() },
+            updateState = { update ->
+                _uiState.value = _uiState.value.copy(
+                    popularMovies = update(_uiState.value.popularMovies)
+                )
             }
-        }
+        )
     }
 
     fun loadTopRatedMovies() {
-        viewModelScope.launch {
-            updateTopRated { it.copy(isLoading = true, error = null) }
-
-            repository.getTopRatedMovies().collect { result ->
-                result.onSuccess { movies ->
-                    updateTopRated {
-                        it.copy(data = movies, isLoading = false, error = null)
-                    }
-                }.onFailure { exception ->
-                    updateTopRated {
-                        it.copy(
-                            data = emptyList(),
-                            isLoading = false,
-                            error = exception.message ?: "Unknown error"
-                        )
-                    }
-                }
+        loadMovies(
+            repositoryCall = { repository.getTopRatedMovies() },
+            updateState = { update ->
+                _uiState.value = _uiState.value.copy(
+                    topRated = update(_uiState.value.topRated)
+                )
             }
-        }
+        )
+    }
+
+    fun loadNowPlayingMovies() {
+        loadMovies(
+            repositoryCall = { repository.getNowPlayingMovies() },
+            updateState = { update ->
+                _uiState.value = _uiState.value.copy(
+                    nowPlaying = update(_uiState.value.nowPlaying)
+                )
+            }
+        )
     }
 
 

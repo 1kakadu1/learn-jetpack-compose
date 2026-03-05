@@ -1,4 +1,4 @@
-package com.example.entertainhub.ui.modifiers
+package com.example.entertainhub.ui.theme.modifiers
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background

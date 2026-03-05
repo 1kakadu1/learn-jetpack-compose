@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,9 +17,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.entertainhub.data.mock.MovieMockData
+import com.example.entertainhub.data.model.Movie
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCard
+import com.example.entertainhub.ui.components.cards.card_movie.MovieCardPlaceholder
 import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarousel
+import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarouselItem
 import com.example.entertainhub.ui.components.scaffolds.MainScaffold
 import com.example.entertainhub.ui.components.headers.header_main.HeaderMain
 import com.example.entertainhub.ui.components.home_bottom_app_bar.HomeBottomAppBar
@@ -25,6 +29,7 @@ import com.example.entertainhub.ui.navigation.Routes
 import com.example.entertainhub.ui.theme.DarkMain
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.utils.SetSystemBarsColor
+import kotlin.String
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
@@ -36,16 +41,22 @@ fun HomeScreen(navController: NavHostController) {
     HomeView(
         onNavigateMovieDetail = onNavigateMovieDetail,
         onNavigateSearch = onNavigateSearch,
-        uiState = uiState
+        uiState = uiState,
+        onRefresh = { viewModel.retry() }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(
     onNavigateMovieDetail: (String) -> Unit,
     onNavigateSearch: () -> Unit,
-    uiState: HomeUiState
+    uiState: HomeUiState,
+    onRefresh: () -> Unit,
 ) {
+    val isLoadingAll =
+        uiState.popularMovies.isLoading || uiState.topRated.isLoading || uiState.nowPlaying.isLoading
+    val nowPlaying: Movie? = if(uiState.nowPlaying.data.isEmpty()) null else uiState.nowPlaying.data[0]
     SetSystemBarsColor(
         statusBarColor = DarkMain,
         darkIcons = false,
@@ -54,59 +65,83 @@ fun HomeView(
     MainScaffold(
         bottomBar = { HomeBottomAppBar() }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+        PullToRefreshBox(
+            isRefreshing = isLoadingAll,
+            onRefresh = { onRefresh() },
         ) {
-            item {
-                HeaderMain(
-                    onClickSearch = onNavigateSearch
-                )
-            }
-            item {
-                Box(Modifier.size(26.dp))
-            }
-            item {
-                MovieCard(
-                    title = "The Hobbit: An Unexpected Journey The Hobbit: An Unexpected Journey",
-                    imageUrl = "https://i.pinimg.com/736x/f2/f5/ed/f2f5ed5520b877478784a8cbd6828e57.jpg",
-                    ageRating = "6+",
-                    language = "ENGLISH",
-                    genre = "FANTASY",
-                    format = "2D.3D.4DX",
-                    onWatchTrailerClick = {},
-                    onBookClick = { onNavigateMovieDetail("featured-movie") }
-                )
-            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+            ) {
+                item {
+                    HeaderMain(
+                        onClickSearch = onNavigateSearch
+                    )
+                }
+                item {
+                    Box(Modifier.size(26.dp))
+                }
+                item {
+                    if (uiState.nowPlaying.isLoading) {
+                        MovieCardPlaceholder()
+                    } else if(nowPlaying != null) {
+                        MovieCard(
+                            title = nowPlaying.title,
+                            imageUrl = nowPlaying.posterUrl,
+                            ageRating = nowPlaying.rating.toString(),
+                            language = nowPlaying.originalLanguage,
+                            genre = nowPlaying.genres.toString(),
+                            format = "2D.3D.4DX",
+                            onWatchTrailerClick = {},
+                            onBookClick = { onNavigateMovieDetail(nowPlaying.id.toString()) },
+                        )
+                    }
 
-            item {
-                Spacer(modifier = Modifier.height(26.dp))
-            }
-            item {
-                MediaCarousel(
-                    title = "Recommended Movies",
-                    items = MovieMockData.recommendedMovies,
-                    onSeeAllClick = {},
-                    onItemClick = { onNavigateMovieDetail("featured-movie") },
-                    isLoading = uiState.popularMovies.isLoading
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(26.dp))
-            }
-            item {
-                MediaCarousel(
-                    title = "Recommended Movies",
-                    items = MovieMockData.recommendedMovies,
-                    onSeeAllClick = {},
-                    onItemClick = { onNavigateMovieDetail("featured-movie") }
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(26.dp))
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(26.dp))
+                }
+                item {
+                    MediaCarousel(
+                        title = "Popular movies",
+                        items = uiState.popularMovies.data.map {
+                            MediaCarouselItem(
+                                id = it.id.toString(),
+                                title = it.title,
+                                imageUrl = it.posterUrl
+                            )
+                        },
+                        onSeeAllClick = {},
+                        onItemClick = { onNavigateMovieDetail("featured-movie") },
+                        isLoading = uiState.popularMovies.isLoading
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(26.dp))
+                }
+                item {
+                    MediaCarousel(
+                        title = "Top movies",
+                        items = uiState.topRated.data.map {
+                            MediaCarouselItem(
+                                id = it.id.toString(),
+                                title = it.title,
+                                imageUrl = it.posterUrl
+                            )
+                        },
+                        onSeeAllClick = {},
+                        onItemClick = { onNavigateMovieDetail("featured-movie") },
+                        isLoading = uiState.topRated.isLoading
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
             }
         }
+
     }
 }
 
@@ -114,10 +149,15 @@ fun HomeView(
 @Composable
 fun HomeScreenPreview() {
     EntertainHubTheme {
-        HomeView(onNavigateMovieDetail = {}, onNavigateSearch = {}, uiState = HomeUiState(
-            popularMovies = DataState(isLoading = false),
-            topRated = DataState(isLoading = false)
-        ))
+        HomeView(
+            onNavigateMovieDetail = {},
+            onNavigateSearch = {},
+            onRefresh = {},
+            uiState = HomeUiState(
+                popularMovies = DataState(isLoading = false),
+                topRated = DataState(isLoading = false)
+            )
+        )
     }
 }
 
@@ -126,10 +166,14 @@ fun HomeScreenPreview() {
 fun HomeScreenPreviewLoading() {
     EntertainHubTheme {
         HomeView(
-            onNavigateMovieDetail = {}, onNavigateSearch = {}, uiState = HomeUiState(
-            popularMovies = DataState(isLoading = true),
-            topRated = DataState(isLoading = true)
-        )
+            onNavigateMovieDetail = {},
+            onNavigateSearch = {},
+            onRefresh = {},
+            uiState = HomeUiState(
+                popularMovies = DataState(isLoading = true),
+                topRated = DataState(isLoading = true),
+                nowPlaying = DataState(isLoading = true)
+            )
         )
     }
 }

@@ -18,7 +18,8 @@ object MovieMapper {
             backdropUrl = buildImageUrl(dto.backdropPath, BACKDROP_SIZE),
             releaseDate = dto.releaseDate,
             rating = dto.voteAverage.toFloat(),
-            genres = dto.genreIds
+            genres = dto.genreIds,
+            originalLanguage = dto.originalLanguage
         )
     }
 

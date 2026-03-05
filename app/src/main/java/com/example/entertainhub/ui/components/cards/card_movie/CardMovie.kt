@@ -33,6 +33,31 @@ import com.example.entertainhub.ui.components.gradient_button.GradientButton
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.ui.theme.GrayColor
 import com.example.entertainhub.ui.theme.RedColor
+import com.example.entertainhub.ui.theme.modifiers.shimmerEffect
+
+@Composable
+fun MovieCardPlaceholder(modifier: Modifier = Modifier) {
+    Column {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(279.dp)
+                .clip(RoundedCornerShape(48.dp))
+                .shimmerEffect(),
+        )
+        Box(
+            modifier = Modifier
+                //.align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .height(110.dp)
+                .absoluteOffset(y = (-46).dp)
+                .clip(RoundedCornerShape(48.dp))
+                .shimmerEffect(),
+
+            )
+    }
+
+}
 
 @Composable
 fun MovieCard(
@@ -164,13 +189,17 @@ fun MovieCard(
                                         )
                                     )
                                 }
-                                Text(genre, color = MaterialTheme.colorScheme.primary,style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.inter_regular)),
-                                    fontWeight = FontWeight(400),
-                                    color = Color(0xFFFFFFFF),
+                                Text(
+                                    genre,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.inter_regular)),
+                                        fontWeight = FontWeight(400),
+                                        color = Color(0xFFFFFFFF),
 
-                                    ))
+                                        )
+                                )
                             }
                             Column(
                                 modifier = Modifier
@@ -220,16 +249,20 @@ fun MovieCardPreview() {
                 .background(Color.Black)
                 .padding(16.dp)
         ) {
-            MovieCard(
-                title = "The Hobbit: An Unexpected Journey The Hobbit: An Unexpected Journey",
-                imageUrl = "https://i.pinimg.com/736x/f2/f5/ed/f2f5ed5520b877478784a8cbd6828e57.jpg",
-                ageRating = "6+",
-                language = "ENGLISH",
-                genre = "FANTASY",
-                format = "2D.3D.4DX",
-                onWatchTrailerClick = {},
-                onBookClick = {}
-            )
+            Column {
+                MovieCard(
+                    title = "The Hobbit: An Unexpected Journey The Hobbit: An Unexpected Journey",
+                    imageUrl = "https://i.pinimg.com/736x/f2/f5/ed/f2f5ed5520b877478784a8cbd6828e57.jpg",
+                    ageRating = "6+",
+                    language = "ENGLISH",
+                    genre = "FANTASY",
+                    format = "2D.3D.4DX",
+                    onWatchTrailerClick = {},
+                    onBookClick = {}
+                )
+                Spacer(Modifier.height(16.dp))
+                MovieCardPlaceholder()
+            }
         }
     }
 }

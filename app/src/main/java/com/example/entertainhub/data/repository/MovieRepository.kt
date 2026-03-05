@@ -1,6 +1,5 @@
 package com.example.entertainhub.data.repository
 
-import android.util.Log
 import com.example.entertainhub.data.model.Movie
 import com.example.entertainhub.data.remote.RetrofitInstance
 import com.example.entertainhub.data.remote.dto.mapper.MovieMapper
@@ -32,6 +31,21 @@ class MovieRepository {
     fun getTopRatedMovies(page: Int = 1): Flow<Result<List<Movie>>> = flow {
         try {
             val response = api.getTopRatedMovies(
+                language = "en-US",
+                page = page
+            )
+
+            val movies = MovieMapper.fromDtoList(response.results)
+            emit(Result.success(movies))
+
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getNowPlayingMovies(page: Int = 1): Flow<Result<List<Movie>>> = flow {
+        try {
+            val response = api.getNowPlayingMovies(
                 language = "en-US",
                 page = page
             )

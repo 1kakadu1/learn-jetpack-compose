@@ -16,6 +16,13 @@ interface TmdbApi {
     suspend fun getTopRatedMovies(
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
-        @Query("region") region: String = "",
+        @Query("region") region: String = "ISO-3166-1 code",
+    ): MoviesResponse
+
+    @GET("movie/now_playing")
+    suspend fun getNowPlayingMovies(
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1,
+        @Query("region") region: String = "ISO-3166-1 code",
     ): MoviesResponse
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.entertainhub.ui.components.cards.card_small.CardSmall
-import com.example.entertainhub.ui.modifiers.shimmerEffect
+import com.example.entertainhub.ui.theme.modifiers.shimmerEffect
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 
 
