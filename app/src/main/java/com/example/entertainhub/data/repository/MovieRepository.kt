@@ -1,6 +1,6 @@
 package com.example.entertainhub.data.repository
 
-import com.example.entertainhub.data.model.Movie
+import com.example.entertainhub.data.model.MoviesResponse
 import com.example.entertainhub.data.remote.RetrofitInstance
 import com.example.entertainhub.data.remote.dto.mapper.MovieMapper
 import kotlinx.coroutines.Dispatchers
@@ -13,45 +13,45 @@ class MovieRepository {
 
     private val api = RetrofitInstance.api
 
-    fun getPopularMovies(page: Int = 1): Flow<Result<List<Movie>>> = flow {
+    fun getPopularMovies(page: Int = 1): Flow<Result<MoviesResponse>> = flow {
         try {
             val response = api.getPopularMovies(
                 language = "en-US",
                 page = page
             )
 
-            val movies = MovieMapper.fromDtoList(response.results)
-            emit(Result.success(movies))
+            val data = MovieMapper.fromResponseDto(response)
+            emit(Result.success(data))
 
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getTopRatedMovies(page: Int = 1): Flow<Result<List<Movie>>> = flow {
+    fun getTopRatedMovies(page: Int = 1): Flow<Result<MoviesResponse>> = flow {
         try {
             val response = api.getTopRatedMovies(
                 language = "en-US",
                 page = page
             )
 
-            val movies = MovieMapper.fromDtoList(response.results)
-            emit(Result.success(movies))
+            val data = MovieMapper.fromResponseDto(response)
+            emit(Result.success(data))
 
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getNowPlayingMovies(page: Int = 1): Flow<Result<List<Movie>>> = flow {
+    fun getNowPlayingMovies(page: Int = 1): Flow<Result<MoviesResponse>> = flow {
         try {
             val response = api.getNowPlayingMovies(
                 language = "en-US",
                 page = page
             )
 
-            val movies = MovieMapper.fromDtoList(response.results)
-            emit(Result.success(movies))
+            val data = MovieMapper.fromResponseDto(response)
+            emit(Result.success(data))
 
         } catch (e: Exception) {
             emit(Result.failure(e))

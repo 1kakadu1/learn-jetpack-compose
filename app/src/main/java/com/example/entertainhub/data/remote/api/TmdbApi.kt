@@ -1,6 +1,6 @@
 package com.example.entertainhub.data.remote.api
 
-import com.example.entertainhub.data.remote.dto.MoviesResponse
+import com.example.entertainhub.data.remote.dto.MoviesResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -10,19 +10,19 @@ interface TmdbApi {
     suspend fun getPopularMovies(
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1
-    ): MoviesResponse
+    ): MoviesResponseDto
 
     @GET("movie/top_rated")
     suspend fun getTopRatedMovies(
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
         @Query("region") region: String = "ISO-3166-1 code",
-    ): MoviesResponse
+    ): MoviesResponseDto
 
     @GET("movie/now_playing")
     suspend fun getNowPlayingMovies(
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
         @Query("region") region: String = "ISO-3166-1 code",
-    ): MoviesResponse
+    ): MoviesResponseDto
 }

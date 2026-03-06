@@ -3,6 +3,7 @@ package com.example.entertainhub.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.entertainhub.data.model.Movie
+import com.example.entertainhub.data.model.MoviesResponse
 import com.example.entertainhub.data.repository.MovieRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,11 @@ import kotlinx.coroutines.launch
 data class DataState<T>(
     val data: List<T> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val isLoadingMore: Boolean = false,
+    val error: String? = null,
+    val currentPage: Int = 0,
+    val totalPages: Int = 0,
+    val hasMore: Boolean = true
 )
 
 data class HomeUiState(
@@ -46,71 +51,103 @@ class HomeViewModel(
     }
 
     private fun loadMovies(
-        repositoryCall: () -> Flow<Result<List<Movie>>>,
-        updateState: ((DataState<Movie>) -> DataState<Movie>) -> Unit
+        currentState: DataState<Movie>,
+        repositoryCall: suspend (page: Int) -> Flow<Result<MoviesResponse>>,
+        updateState: (DataState<Movie>) -> Unit,
+        refresh: Boolean
     ) {
+        if (!refresh && (currentState.isLoadingMore || !currentState.hasMore)) {
+            return
+        }
+
         viewModelScope.launch {
-            updateState { it.copy(isLoading = true, error = null) }
+            val pageToLoad = if (refresh) 1 else currentState.currentPage + 1
+
+            updateState(
+                currentState.copy(
+                    isLoading = refresh,
+                    isLoadingMore = !refresh,
+                    error = null
+                )
+            )
 
             try {
-                repositoryCall().first().onSuccess { movies ->
-                    updateState {
-                        it.copy(data = movies, isLoading = false, error = null)
+                repositoryCall(pageToLoad).first().onSuccess { response ->
+                    val newData = if (refresh) {
+                        response.results
+                    } else {
+                        currentState.data + response.results
                     }
-                }.onFailure { exception ->
-                    updateState {
-                        it.copy(
-                            data = emptyList(),
+
+                    updateState(
+                        DataState(
+                            data = newData,
                             isLoading = false,
+                            isLoadingMore = false,
+                            error = null,
+                            currentPage = response.page,
+                            totalPages = response.totalPages,
+                            hasMore = response.page < response.totalPages
+                        )
+                    )
+                }.onFailure { exception ->
+                    updateState(
+                        currentState.copy(
+                            isLoading = false,
+                            isLoadingMore = false,
                             error = exception.message ?: "Unknown error"
                         )
-                    }
+                    )
                 }
             } catch (e: Exception) {
-                updateState {
-                    it.copy(error = e.message, isLoading = false)
-                }
+                updateState(
+                    currentState.copy(
+                        isLoading = false,
+                        isLoadingMore = false,
+                        error = e.message ?: "Unknown error"
+                    )
+                )
             }
         }
     }
 
 
     fun loadAllData() {
-        loadPopularMovies()
-        loadTopRatedMovies()
-        loadNowPlayingMovies()
+        loadPopularMovies(refresh = true)
+        loadTopRatedMovies(refresh = true)
+        loadNowPlayingMovies(refresh = true)
     }
 
-    fun loadPopularMovies() {
+    fun loadPopularMovies(refresh: Boolean = false) {
         loadMovies(
-            repositoryCall = { repository.getPopularMovies() },
-            updateState = { update ->
-                _uiState.value = _uiState.value.copy(
-                    popularMovies = update(_uiState.value.popularMovies)
-                )
-            }
+            currentState = _uiState.value.popularMovies,
+            repositoryCall = { page -> repository.getPopularMovies(page) },
+            updateState = { newState ->
+                _uiState.value = _uiState.value.copy(popularMovies = newState)
+            },
+            refresh = refresh
         )
     }
 
-    fun loadTopRatedMovies() {
+    fun loadTopRatedMovies(refresh: Boolean = false) {
         loadMovies(
-            repositoryCall = { repository.getTopRatedMovies() },
-            updateState = { update ->
-                _uiState.value = _uiState.value.copy(
-                    topRated = update(_uiState.value.topRated)
-                )
-            }
+            currentState = _uiState.value.topRated,
+            repositoryCall = { page -> repository.getTopRatedMovies(page) },
+            updateState = { newState ->
+                _uiState.value = _uiState.value.copy(topRated = newState)
+            },
+            refresh = refresh
         )
     }
 
-    fun loadNowPlayingMovies() {
+    fun loadNowPlayingMovies(refresh: Boolean = false) {
         loadMovies(
-            repositoryCall = { repository.getNowPlayingMovies() },
-            updateState = { update ->
-                _uiState.value = _uiState.value.copy(
-                    nowPlaying = update(_uiState.value.nowPlaying)
-                )
-            }
+            currentState = _uiState.value.nowPlaying,
+            repositoryCall = { page -> repository.getNowPlayingMovies(page) },
+            updateState = { newState ->
+                _uiState.value = _uiState.value.copy(nowPlaying = newState)
+            },
+            refresh = refresh
         )
     }
 

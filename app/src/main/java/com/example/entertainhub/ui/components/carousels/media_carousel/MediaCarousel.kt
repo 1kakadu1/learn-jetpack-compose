@@ -4,11 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.example.entertainhub.ui.components.cards.card_small.CardSmall
 import com.example.entertainhub.ui.theme.modifiers.shimmerEffect
 import com.example.entertainhub.ui.theme.EntertainHubTheme
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 
 @Composable
@@ -59,17 +63,20 @@ fun MediaCarousel(
     modifier: Modifier = Modifier,
     showSeeAll: Boolean = true,
     isLoading: Boolean = false,
+    isLoadingMore: Boolean = false,
+    hasMore: Boolean = true,
+    onLoadMore: (() -> Unit)? = null
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth()
-    ) {
+    val listState = rememberLazyListState()
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-
         ) {
             Text(
                 text = title,
@@ -77,6 +84,7 @@ fun MediaCarousel(
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
+
             if (showSeeAll) {
                 TextButton(
                     onClick = onSeeAllClick,
@@ -84,7 +92,7 @@ fun MediaCarousel(
                 ) {
                     Text(
                         text = "See All",
-                        color = MaterialTheme.colorScheme.error,  // Красный цвет
+                        color = MaterialTheme.colorScheme.error,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -97,12 +105,14 @@ fun MediaCarousel(
                 }
             }
         }
+
         LazyRow(
+            state = listState,
             contentPadding = PaddingValues(horizontal = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (isLoading) {
-                items(3) {
+            if (isLoading && items.isEmpty()) {
+                items(5) {
                     CardSmallPlaceholder()
                 }
             } else {
@@ -116,9 +126,34 @@ fun MediaCarousel(
                         onClick = { onItemClick(item.id) }
                     )
                 }
-            }
 
+                if (isLoadingMore && items.isNotEmpty()) {
+                    items(2) {
+                        CardSmallPlaceholder()
+                    }
+                }
+            }
         }
+    }
+
+    LaunchedEffect(onLoadMore) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            lastVisible >= totalItems - 3
+        }
+            .distinctUntilChanged()
+            .collect { shouldLoad ->
+                if (shouldLoad &&
+                    !isLoading &&
+                    !isLoadingMore &&
+                    hasMore &&
+                    onLoadMore != null
+                ) {
+                    onLoadMore()
+                }
+            }
     }
 }
 
@@ -184,7 +219,7 @@ fun MultipleCarouselsPreview() {
                 items = mockItems2,
                 onSeeAllClick = {},
                 onItemClick = {},
-                isLoading = false
+                isLoading = false,
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -193,7 +228,7 @@ fun MultipleCarouselsPreview() {
                 title = "Trending Now",
                 items = mockItems2,
                 onSeeAllClick = {},
-                onItemClick = {}
+                onItemClick = {},
             )
         }
     }

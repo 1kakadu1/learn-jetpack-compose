@@ -1,8 +1,10 @@
 package com.example.entertainhub.data.remote.dto.mapper
 
 import com.example.entertainhub.data.model.Movie
+import com.example.entertainhub.data.model.MoviesResponse
+import com.example.entertainhub.data.model.MoviesResponseDates
 import com.example.entertainhub.data.remote.dto.MovieDto
-
+import com.example.entertainhub.data.remote.dto.MoviesResponseDto
 
 object MovieMapper {
     private const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/"
@@ -25,6 +27,21 @@ object MovieMapper {
 
     fun fromDtoList(dtos: List<MovieDto>): List<Movie> {
         return dtos.map { fromDto(it) }
+    }
+
+    fun fromResponseDto(dto: MoviesResponseDto): MoviesResponse {
+        return MoviesResponse(
+            page = dto.page,
+            results=fromDtoList(dto.results),
+            totalPages = dto.totalPages,
+            totalResults = dto.totalResults,
+            dates = dto.dates?.let {
+                MoviesResponseDates(
+                    maximum = it.maximum,
+                    minimum = it.minimum
+                )
+            }
+        )
     }
 
     private fun buildImageUrl(path: String?, size: String): String {

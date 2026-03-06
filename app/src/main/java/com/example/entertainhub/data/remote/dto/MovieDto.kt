@@ -35,14 +35,14 @@ data class MovieDto(
     val originalLanguage: String
 )
 
-data class MoviesResponseDates(
+data class MoviesResponseDatesDto(
     @SerializedName("maximum")
     val maximum: String,
     @SerializedName("minimum")
     val minimum: String
 )
 
-data class MoviesResponse(
+data class MoviesResponseDto(
     @SerializedName("page")
     val page: Int,
 
@@ -56,5 +56,5 @@ data class MoviesResponse(
     val totalResults: Int,
 
     @SerializedName("dates")
-    val dates: MoviesResponseDates? = null
+    val dates: MoviesResponseDatesDto? = null
 )
