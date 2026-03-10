@@ -23,6 +23,17 @@ interface TmdbApi {
     suspend fun getNowPlayingMovies(
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
+        @Query("region") region: String = "",
+    ): MoviesResponseDto
+
+    @GET("search/movie")
+    suspend fun getSearchMovies(
+        @Query("query") query: String,
+        @Query("include_adult") includeAdult: Boolean = false,
+        @Query("primary_release_year") primaryReleaseYear: String = "",
+        @Query("year") year: String = "",
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1,
         @Query("region") region: String = "ISO-3166-1 code",
     ): MoviesResponseDto
 }

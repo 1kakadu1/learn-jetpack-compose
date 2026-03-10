@@ -41,6 +41,12 @@ android {
             "HTTP_PROXY",
             "\"${localProperties["HTTP_PROXY"]}\""
         )
+
+        buildConfigField(
+            "String",
+            "HTTP_PROXY_HOSTNAME",
+            "\"${localProperties["HTTP_PROXY_HOSTNAME"]}\""
+        )
     }
 
     buildTypes {

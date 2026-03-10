@@ -33,9 +33,9 @@ object RetrofitInstance {
         .apply {
             if (BuildConfig.HTTP_PROXY === "true") {
                 val proxy = Proxy(
-                    Proxy.Type.HTTP,  // HTTP прокси
+                    Proxy.Type.HTTP,  // HTTP Proxy
                     InetSocketAddress(
-                        "10.0.2.2",
+                        BuildConfig.HTTP_PROXY_HOSTNAME,
                         2080
                     )
                 )

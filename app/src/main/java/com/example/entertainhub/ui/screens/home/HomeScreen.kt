@@ -29,6 +29,7 @@ import com.example.entertainhub.ui.navigation.Routes
 import com.example.entertainhub.ui.theme.DarkMain
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.utils.SetSystemBarsColor
+import kotlin.Boolean
 import kotlin.String
 
 @Composable
@@ -38,11 +39,19 @@ fun HomeScreen(navController: NavHostController) {
     val onNavigateMovieDetail: (String) -> Unit =
         { id -> navController.navigate(Routes.details(id)) }
     val onNavigateSearch: () -> Unit = { navController.navigate(Routes.SEARCH) }
+    val onLoadMore: (type: String)-> Unit = { type ->
+        if(type === "top"){
+            viewModel.loadTopRatedMovies()
+        }else{
+            viewModel.loadPopularMovies()
+        }
+    }
     HomeView(
         onNavigateMovieDetail = onNavigateMovieDetail,
         onNavigateSearch = onNavigateSearch,
         uiState = uiState,
-        onRefresh = { viewModel.retry() }
+        onRefresh = { viewModel.retry() },
+        onLoadMore = onLoadMore
     )
 }
 
@@ -53,6 +62,7 @@ fun HomeView(
     onNavigateSearch: () -> Unit,
     uiState: HomeUiState,
     onRefresh: () -> Unit,
+    onLoadMore: (type: String)-> Unit
 ) {
     val isLoadingAll =
         uiState.popularMovies.isLoading || uiState.topRated.isLoading || uiState.nowPlaying.isLoading
@@ -114,8 +124,11 @@ fun HomeView(
                             )
                         },
                         onSeeAllClick = {},
-                        onItemClick = { onNavigateMovieDetail("featured-movie") },
-                        isLoading = uiState.popularMovies.isLoading
+                        onItemClick = onNavigateMovieDetail,
+                        isLoading = uiState.popularMovies.isLoading,
+                        isLoadingMore = uiState.popularMovies.isLoadingMore,
+                        hasMore = uiState.popularMovies.hasMore,
+                        onLoadMore= { onLoadMore("popular") }
                     )
                 }
                 item {
@@ -132,8 +145,11 @@ fun HomeView(
                             )
                         },
                         onSeeAllClick = {},
-                        onItemClick = { onNavigateMovieDetail("featured-movie") },
-                        isLoading = uiState.topRated.isLoading
+                        onItemClick = onNavigateMovieDetail,
+                        isLoading = uiState.topRated.isLoading,
+                        isLoadingMore = uiState.topRated.isLoadingMore,
+                        hasMore = uiState.topRated.hasMore,
+                        onLoadMore= { onLoadMore("top") }
                     )
                 }
                 item {
@@ -156,7 +172,8 @@ fun HomeScreenPreview() {
             uiState = HomeUiState(
                 popularMovies = DataState(isLoading = false),
                 topRated = DataState(isLoading = false)
-            )
+            ),
+            onLoadMore = {}
         )
     }
 }
@@ -173,7 +190,8 @@ fun HomeScreenPreviewLoading() {
                 popularMovies = DataState(isLoading = true),
                 topRated = DataState(isLoading = true),
                 nowPlaying = DataState(isLoading = true)
-            )
+            ),
+            onLoadMore = {}
         )
     }
 }

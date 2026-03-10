@@ -2,8 +2,8 @@ package com.example.entertainhub.ui.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.entertainhub.data.mock.SearchMockData
 import com.example.entertainhub.data.model.SearchResult
+import com.example.entertainhub.data.repository.MovieRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ data class SearchState(
 )
 
 @OptIn(FlowPreview::class)
-class SearchViewModel : ViewModel() {
+class SearchViewModel(private val repository: MovieRepository = MovieRepository()) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -44,7 +44,7 @@ class SearchViewModel : ViewModel() {
         _searchQuery.value = query
         _searchState.value = _searchState.value.copy(
             query = query,
-            isSearching = query.isNotEmpty()
+            //  isSearching = query.isNotEmpty()
         )
     }
 
@@ -54,23 +54,33 @@ class SearchViewModel : ViewModel() {
     }
 
     private suspend fun performSearch(query: String) {
-        _searchState.value = _searchState.value.copy(isSearching = true)
+        _searchState.value =
+            _searchState.value.copy(isSearching = true, query = query, error = null)
 
         try {
-            // val results = repository.search(query)
+            repository.getSearchMovies(query).first().onSuccess { response ->
 
-            kotlinx.coroutines.delay(300)  // Имитация задержки
-            val allMovies = SearchMockData.searchRezult
+                _searchState.value = SearchState(
+                    query = query,
+                    results = response.results.map { it ->
+                        SearchResult(
+                            id = it.id.toString(),
+                            title = it.title,
+                            image = it.posterUrl
+                        )
+                    },
+                    isSearching = false
+                )
+            }.onFailure { exception ->
 
-            val results = allMovies.filter {
-                it.title.contains(query, ignoreCase = true)
+                _searchState.value.copy(
+                    isSearching = false,
+                    error = exception.message ?: "Unknown error"
+                )
+
             }
 
-            _searchState.value = SearchState(
-                query = query,
-                results = results,
-                isSearching = false
-            )
+
         } catch (e: Exception) {
             _searchState.value = _searchState.value.copy(
                 isSearching = false,

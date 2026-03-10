@@ -23,10 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.entertainhub.data.mock.MovieMockData
+// import com.example.entertainhub.data.mock.MovieMockData
 import com.example.entertainhub.data.model.SearchResult
 import com.example.entertainhub.ui.components.cards.card_small.CardSmall
-import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarousel
+// import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarousel
 import com.example.entertainhub.ui.components.scaffolds.MainScaffold
 import com.example.entertainhub.ui.components.top_bars.search_topbar.SearchTopBar
 import com.example.entertainhub.ui.theme.EntertainHubTheme
@@ -79,20 +79,20 @@ fun SearchView(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Spacer(Modifier.height(20.dp))
-            MediaCarousel(
-                title = "They often search for",
-                items = MovieMockData.recommendedMovies,
-                onSeeAllClick = {},
-                onItemClick = {},
-                showSeeAll = false
-            )
-            Spacer(Modifier.height(20.dp))
+            //Spacer(Modifier.height(20.dp))
+//            MediaCarousel(
+//                title = "They often search for",
+//                items = MovieMockData.recommendedMovies,
+//                onSeeAllClick = {},
+//                onItemClick = {},
+//                showSeeAll = false
+//            )
+//            Spacer(Modifier.height(20.dp))
             SearchResults(
                 query = search,
                 state = searchState,
                 onItemClick = {},
-                isList= isList
+                isList = isList
             )
         }
     }
@@ -110,12 +110,12 @@ private fun SearchResults(
         state.isSearching -> LoadingState()
         state.results.isEmpty() -> NoResultsState()
         else -> {
-            if(isList){
+            if (isList) {
                 SearchResultsList(
                     results = state.results,
                     onItemClick = onItemClick
                 )
-            }else{
+            } else {
                 SearchResultsGrid(
                     results = state.results,
                     onItemClick = onItemClick
