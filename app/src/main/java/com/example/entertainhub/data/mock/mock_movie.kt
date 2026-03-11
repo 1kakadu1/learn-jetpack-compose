@@ -1,10 +1,82 @@
 package com.example.entertainhub.data.mock
 
 import com.example.entertainhub.data.model.MovieDetailData
+import com.example.entertainhub.data.remote.dto.MovieDto
+import com.example.entertainhub.data.remote.dto.MoviesResponseDto
+import com.example.entertainhub.data.remote.dto.mapper.MovieMapper
 import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarouselItem
 
-object MovieMockData {
 
+object MovieMockData {
+    val moviesResponseResults = listOf(
+        MovieDto(
+            backdropPath = "/gMJngTNfaqCSCqGD4y8lVMZXKDn.jpg",
+            genreIds = listOf(
+                28,
+                12,
+                878
+            ),
+            id = 640146,
+            originalLanguage = "en",
+            title = "Ant-Man and the Wasp: Quantumania",
+            overview = "Super-Hero partners Scott Lang and Hope van Dyne, along with with Hope's parents Janet van Dyne and Hank Pym, and Scott's daughter Cassie Lang, find themselves exploring the Quantum Realm, interacting with strange new creatures and embarking on an adventure that will push them beyond the limits of what they thought possible.",
+            posterPath = "/ngl2FKBlU4fhbdsrtdom9LVLBXw.jpg",
+            releaseDate = "2023-02-15",
+            voteAverage = 6.8
+        ),
+        MovieDto(
+            backdropPath = "/gMJngTNfaqCSCqGD4y8lVMZXKDn.jpg",
+            genreIds = listOf(
+                28,
+                80,
+                53
+            ),
+            id = 849869,
+            originalLanguage = "ko",
+            title = "Kill Boksoon",
+            overview = "At work, she's a renowned assassin. At home, she's a single mom to a teenage daughter. Killing? That's easy. It's parenting that's the hard part.",
+            posterPath = "/taYgn3RRpCGlTGdaGQvnSIOzXFy.jpg",
+            releaseDate = "2023-02-17",
+            voteAverage = 6.8
+        ),
+        MovieDto(
+            backdropPath = "/gMJngTNfaqCSCqGD4y8lVMZXKDn.jpg",
+            genreIds = listOf(
+                28,
+                878
+            ),
+            id = 1033219,
+            originalLanguage = "en",
+            title = "Attack on Titan",
+            overview = "As viable water is depleted on Earth, a mission is sent to Saturn's moon Titan to retrieve sustainable H2O reserves from its alien inhabitants. But just as the humans acquire the precious resource, they are attacked by Titan rebels, who don't trust that the Earthlings will leave in peace.",
+            posterPath = "qNz4l8UgTkD8rlqiKZ556pCJ9iO.jpg",
+            releaseDate = "2022-09-30",
+            voteAverage = 6.1
+        ),
+        MovieDto(
+            backdropPath = "/gMJngTNfaqCSCqGD4y8lVMZXKDn.jpg",
+            genreIds = listOf(
+                10751,
+                28,
+                12
+            ),
+            id = 946310,
+            originalLanguage = "en",
+            title = "Ant-Man and the Wasp: Quantumania",
+            overview = "The pirates feel right at home in Sandborough, but the atmosphere cools right down when the ninjas come to live in the street. After all, pirates and ninjas are sworn enemies!  While pirate captain Hector Blunderbuss struggles to get rid of his new neighbours, son Billy and ninja daughter Yuka become friends. The pirates challenge the ninjas to the ultimate battle at the village's annual hexathlon. Who will win the match? Ninjas are faster and more agile of course, but pirates are the best cheats in all of the seven seas...",
+            posterPath = "/uDsvma9dAwnDPVuCFi99YpWvBk0.jpg",
+            releaseDate = "2022-04-20",
+            voteAverage = 6.4
+        ),
+    )
+    val moviesResponse = MovieMapper.fromResponseDto(
+        MoviesResponseDto(
+            page = 1,
+            results = moviesResponseResults,
+            totalPages = 38029,
+            totalResults = 760569,
+        )
+    )
     val recommendedMovies = listOf(
         MediaCarouselItem(
             id = "1",

@@ -11,11 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.entertainhub.ui.theme.BlackColor
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.ui.theme.customTypography
@@ -26,9 +28,9 @@ fun CardSmall(
     title: String,
     imageUrl: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-
+    modifier: Modifier = Modifier
     ) {
+
     Card(
         onClick = onClick,
         modifier = modifier
@@ -46,7 +48,13 @@ fun CardSmall(
                     .height(216.dp)
             ) {
                 AsyncImage(
-                    model = imageUrl,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl)
+                        .size(190, 216)
+                        .crossfade(true)
+                        .memoryCacheKey(imageUrl)
+                        .diskCacheKey(imageUrl)
+                        .build(),
                     contentDescription = title,
                     modifier = Modifier
                         .fillMaxWidth()

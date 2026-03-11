@@ -11,7 +11,7 @@ data class Movie(
     val backdropUrl: String,
     val releaseDate: String,
     val rating: Float,
-    val genres: List<Int>,
+    val genres: List<String>,
     val originalLanguage: String
 )
 

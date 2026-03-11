@@ -112,7 +112,7 @@ fun MediaCarousel(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (isLoading && items.isEmpty()) {
-                items(5) {
+                items(5, key = { it }) {
                     CardSmallPlaceholder()
                 }
             } else {
@@ -128,7 +128,7 @@ fun MediaCarousel(
                 }
 
                 if (isLoadingMore && items.isNotEmpty()) {
-                    items(2) {
+                    items(2, key = { "loading-$it" }) {
                         CardSmallPlaceholder()
                     }
                 }

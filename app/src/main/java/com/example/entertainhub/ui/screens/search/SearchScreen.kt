@@ -35,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import com.example.entertainhub.ui.theme.DarkMain
 import com.example.entertainhub.utils.SetSystemBarsColor
@@ -196,7 +197,7 @@ private fun SearchResultsList(
             )
         }
 
-        items(results) { result ->
+        items(results,  key = { it.id }) { result ->
             CardSmall(
                 title = result.title,
                 imageUrl = result.image,

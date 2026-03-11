@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.entertainhub.data.mock.MovieMockData
 import com.example.entertainhub.data.model.Movie
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCard
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCardPlaceholder
@@ -29,7 +30,6 @@ import com.example.entertainhub.ui.navigation.Routes
 import com.example.entertainhub.ui.theme.DarkMain
 import com.example.entertainhub.ui.theme.EntertainHubTheme
 import com.example.entertainhub.utils.SetSystemBarsColor
-import kotlin.Boolean
 import kotlin.String
 
 @Composable
@@ -39,10 +39,10 @@ fun HomeScreen(navController: NavHostController) {
     val onNavigateMovieDetail: (String) -> Unit =
         { id -> navController.navigate(Routes.details(id)) }
     val onNavigateSearch: () -> Unit = { navController.navigate(Routes.SEARCH) }
-    val onLoadMore: (type: String)-> Unit = { type ->
-        if(type === "top"){
+    val onLoadMore: (type: String) -> Unit = { type ->
+        if (type === "top") {
             viewModel.loadTopRatedMovies()
-        }else{
+        } else {
             viewModel.loadPopularMovies()
         }
     }
@@ -62,11 +62,12 @@ fun HomeView(
     onNavigateSearch: () -> Unit,
     uiState: HomeUiState,
     onRefresh: () -> Unit,
-    onLoadMore: (type: String)-> Unit
+    onLoadMore: (type: String) -> Unit
 ) {
     val isLoadingAll =
         uiState.popularMovies.isLoading || uiState.topRated.isLoading || uiState.nowPlaying.isLoading
-    val nowPlaying: Movie? = if(uiState.nowPlaying.data.isEmpty()) null else uiState.nowPlaying.data[0]
+    val nowPlaying: Movie? =
+        if (uiState.nowPlaying.data.isEmpty()) null else uiState.nowPlaying.data[0]
     SetSystemBarsColor(
         statusBarColor = DarkMain,
         darkIcons = false,
@@ -95,13 +96,13 @@ fun HomeView(
                 item {
                     if (uiState.nowPlaying.isLoading) {
                         MovieCardPlaceholder()
-                    } else if(nowPlaying != null) {
+                    } else if (nowPlaying != null) {
                         MovieCard(
                             title = nowPlaying.title,
                             imageUrl = nowPlaying.posterUrl,
                             ageRating = nowPlaying.rating.toString(),
                             language = nowPlaying.originalLanguage,
-                            genre = nowPlaying.genres.toString(),
+                            genre = nowPlaying.genres.joinToString(),
                             format = "2D.3D.4DX",
                             onWatchTrailerClick = {},
                             onBookClick = { onNavigateMovieDetail(nowPlaying.id.toString()) },
@@ -128,7 +129,7 @@ fun HomeView(
                         isLoading = uiState.popularMovies.isLoading,
                         isLoadingMore = uiState.popularMovies.isLoadingMore,
                         hasMore = uiState.popularMovies.hasMore,
-                        onLoadMore= { onLoadMore("popular") }
+                        onLoadMore = { onLoadMore("popular") }
                     )
                 }
                 item {
@@ -149,7 +150,7 @@ fun HomeView(
                         isLoading = uiState.topRated.isLoading,
                         isLoadingMore = uiState.topRated.isLoadingMore,
                         hasMore = uiState.topRated.hasMore,
-                        onLoadMore= { onLoadMore("top") }
+                        onLoadMore = { onLoadMore("top") }
                     )
                 }
                 item {
@@ -170,8 +171,15 @@ fun HomeScreenPreview() {
             onNavigateSearch = {},
             onRefresh = {},
             uiState = HomeUiState(
-                popularMovies = DataState(isLoading = false),
-                topRated = DataState(isLoading = false)
+                nowPlaying = DataState(
+                    isLoading = false,
+                    data = MovieMockData.moviesResponse.results
+                ),
+                popularMovies = DataState(
+                    isLoading = false,
+                    data = MovieMockData.moviesResponse.results
+                ),
+                topRated = DataState(isLoading = false, data = MovieMockData.moviesResponse.results)
             ),
             onLoadMore = {}
         )
