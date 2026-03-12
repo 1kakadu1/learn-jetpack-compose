@@ -2,6 +2,7 @@ package com.example.entertainhub.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.entertainhub.data.local.dao.MovieDao
 import com.example.entertainhub.data.model.Movie
 import com.example.entertainhub.data.model.MoviesResponse
 import com.example.entertainhub.data.repository.MovieRepository
@@ -29,6 +30,7 @@ data class HomeUiState(
 )
 
 class HomeViewModel(
+    private val dao: MovieDao,
     private val repository: MovieRepository = MovieRepository()
 ) : ViewModel() {
 
