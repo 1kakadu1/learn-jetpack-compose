@@ -17,7 +17,7 @@ data class SearchState(
 )
 
 @OptIn(FlowPreview::class)
-class SearchViewModel(private val repository: MovieRepository = MovieRepository()) : ViewModel() {
+class SearchViewModel(private val repository: MovieRepository) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()

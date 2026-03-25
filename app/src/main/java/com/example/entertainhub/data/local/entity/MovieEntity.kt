@@ -9,15 +9,23 @@ enum class MovieListType {
     NOW_PLAYING
 }
 
-@Entity(tableName = "movies", primaryKeys = ["id", "listType"] ,indices = [Index(value = ["listType"])])
+@Entity(
+    tableName = "movies",
+    primaryKeys = ["id", "listType"],
+    indices = [Index(value = ["listType", "page"]), Index(value = ["cachedAt"])]
+)
 data class MovieEntity(
-     val id: Int,
-     val title: String,
-     val overview: String,
-     val posterUrl: String,
-     val backdropUrl: String,
-     val releaseDate: String,
-     val rating: Float,
-     val category: List<String>,
-     val listType: MovieListType,
+    val id: Int,
+    val title: String,
+    val overview: String,
+    val posterUrl: String,
+    val backdropUrl: String,
+    val releaseDate: String,
+    val rating: Float,
+    val genres: List<String>,
+    val listType: MovieListType,
+    val page: Int,
+    val position: Int,
+    val originalLanguage: String,
+    val cachedAt: Long = System.currentTimeMillis()
 )

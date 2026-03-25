@@ -30,8 +30,7 @@ data class HomeUiState(
 )
 
 class HomeViewModel(
-    private val dao: MovieDao,
-    private val repository: MovieRepository = MovieRepository()
+    private val repository: MovieRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -74,32 +73,36 @@ class HomeViewModel(
             )
 
             try {
-                repositoryCall(pageToLoad).first().onSuccess { response ->
-                    val newData = if (refresh) {
-                        response.results
-                    } else {
-                        currentState.data + response.results
-                    }
+                repositoryCall(pageToLoad).collect { result ->
+                    result.onSuccess { response ->
 
-                    updateState(
-                        DataState(
-                            data = newData,
-                            isLoading = false,
-                            isLoadingMore = false,
-                            error = null,
-                            currentPage = response.page,
-                            totalPages = response.totalPages,
-                            hasMore = response.page < response.totalPages
+                        val newData = if (refresh) {
+                            response.results
+                        } else {
+                            currentState.data + response.results
+                        }
+
+                        updateState(
+                            DataState(
+                                data = newData,
+                                isLoading = false,
+                                isLoadingMore = false,
+                                error = null,
+                                currentPage = response.page,
+                                totalPages = response.totalPages,
+                                hasMore = response.page < response.totalPages
+                            )
                         )
-                    )
-                }.onFailure { exception ->
-                    updateState(
-                        currentState.copy(
-                            isLoading = false,
-                            isLoadingMore = false,
-                            error = exception.message ?: "Unknown error"
+
+                    }.onFailure { exception ->
+                        updateState(
+                            currentState.copy(
+                                isLoading = false,
+                                isLoadingMore = false,
+                                error = exception.message ?: "Unknown error"
+                            )
                         )
-                    )
+                    }
                 }
             } catch (e: Exception) {
                 updateState(
