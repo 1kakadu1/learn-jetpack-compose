@@ -1,6 +1,7 @@
 package com.example.entertainhub.ui.screens.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.entertainhub.data.local.dao.MovieDao
 import com.example.entertainhub.data.model.Movie
@@ -28,6 +29,15 @@ data class HomeUiState(
     val topRated: DataState<Movie> = DataState(),
     val nowPlaying: DataState<Movie> = DataState(),
 )
+
+class HomeViewModelFactory(
+    private val repository: MovieRepository
+) : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return HomeViewModel(repository) as T
+    }
+}
 
 class HomeViewModel(
     private val repository: MovieRepository
@@ -64,6 +74,8 @@ class HomeViewModel(
         viewModelScope.launch {
             val pageToLoad = if (refresh) 1 else currentState.currentPage + 1
 
+            var isFirstEmit = true
+
             updateState(
                 currentState.copy(
                     isLoading = refresh,
@@ -74,8 +86,8 @@ class HomeViewModel(
 
             try {
                 repositoryCall(pageToLoad).collect { result ->
-                    result.onSuccess { response ->
 
+                    result.onSuccess { response ->
                         val newData = if (refresh) {
                             response.results
                         } else {
@@ -94,14 +106,18 @@ class HomeViewModel(
                             )
                         )
 
+                        isFirstEmit = false
+
                     }.onFailure { exception ->
-                        updateState(
-                            currentState.copy(
-                                isLoading = false,
-                                isLoadingMore = false,
-                                error = exception.message ?: "Unknown error"
+                        if (isFirstEmit) {
+                            updateState(
+                                currentState.copy(
+                                    isLoading = false,
+                                    isLoadingMore = false,
+                                    error = exception.message ?: "Unknown error"
+                                )
                             )
-                        )
+                        }
                     }
                 }
             } catch (e: Exception) {

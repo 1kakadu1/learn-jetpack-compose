@@ -13,12 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.entertainhub.data.local.AppDatabase
 import com.example.entertainhub.data.mock.MovieMockData
 import com.example.entertainhub.data.model.Movie
+import com.example.entertainhub.data.repository.MovieRepository
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCard
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCardPlaceholder
 import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarousel
@@ -34,7 +37,16 @@ import kotlin.String
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    val viewModel = viewModel<HomeViewModel>()
+    val context = LocalContext.current
+
+    val db = AppDatabase.getInstance(context)
+    val dao = db.movieDao()
+
+    val repository = MovieRepository(dao)
+
+    val viewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(repository)
+    )
     val uiState by viewModel.uiState.collectAsState()
     val onNavigateMovieDetail: (String) -> Unit =
         { id -> navController.navigate(Routes.details(id)) }
