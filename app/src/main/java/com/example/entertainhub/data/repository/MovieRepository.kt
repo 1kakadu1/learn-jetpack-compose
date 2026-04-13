@@ -1,6 +1,5 @@
 package com.example.entertainhub.data.repository
 
-import com.example.entertainhub.BuildConfig
 import com.example.entertainhub.data.local.dao.MovieDao
 import com.example.entertainhub.data.local.entity.MovieEntity
 import com.example.entertainhub.data.local.entity.MovieListType
@@ -19,9 +18,9 @@ class MovieRepository(
     private val api: TmdbApi = RetrofitInstance.api
 ) {
 
-    companion object {
+    /* companion object {
         private const val CACHE_DURATION = 1 * 60 * 60 * 1000L  // 1h
-    }
+    } */
 
     fun getPopularMovies(page: Int = 1, forceRefresh: Boolean = false) =
         getMoviesByType(MovieListType.POPULAR, page, forceRefresh)
@@ -68,7 +67,6 @@ class MovieRepository(
 
             val response = MovieMapper.fromResponseDto(responseDto)
 
-            // ✅ Шаг 3: Сохраняем в БД
             val entities = response.results.mapIndexed { index, movie ->
                 movie.toEntity(listType, page, index)
             }
@@ -76,13 +74,10 @@ class MovieRepository(
             dao.deletePage(listType, page)
             dao.insertAll(entities)
 
-            // ✅ Шаг 4: Эмитим свежие данные
             emit(Result.success(response))
 
         } catch (e: Exception) {
-            // ✅ При ошибке: если не эмитили кеш — эмитим ошибку
             if (!hasCachedData) {
-                // Попытка вернуть stale cache
                 val staleCache = dao.getPage(listType, page)
                 if (staleCache.isNotEmpty()) {
                     emit(Result.success(staleCache.toMoviesResponse(page)))
@@ -90,7 +85,6 @@ class MovieRepository(
                     emit(Result.failure(e))
                 }
             }
-            // Если уже эмитили кеш — молча игнорируем ошибку
         }
 
     }.flowOn(Dispatchers.IO)
@@ -115,7 +109,6 @@ class MovieRepository(
     }
 }
 
-// Extensions
 private fun List<MovieEntity>.toMoviesResponse(page: Int) = MoviesResponse(
     page = page,
     results = map { it.toMovie() },

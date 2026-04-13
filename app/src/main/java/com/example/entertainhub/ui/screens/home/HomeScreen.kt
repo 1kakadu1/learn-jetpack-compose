@@ -22,6 +22,7 @@ import com.example.entertainhub.data.local.AppDatabase
 import com.example.entertainhub.data.mock.MovieMockData
 import com.example.entertainhub.data.model.Movie
 import com.example.entertainhub.data.repository.MovieRepository
+import com.example.entertainhub.di.LocalAppContainer
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCard
 import com.example.entertainhub.ui.components.cards.card_movie.MovieCardPlaceholder
 import com.example.entertainhub.ui.components.carousels.media_carousel.MediaCarousel
@@ -37,13 +38,7 @@ import kotlin.String
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    val context = LocalContext.current
-
-    val db = AppDatabase.getInstance(context)
-    val dao = db.movieDao()
-
-    val repository = MovieRepository(dao)
-
+    val repository = LocalAppContainer.current.movieRepository
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(repository)
     )
